@@ -115,7 +115,11 @@ class App extends Component {
             {this.props.isBusy ? (<Spinner message={this.props.message} />) : null}
             {this.props.adAssassinId ? <FacebookInit
               fbLogin={() => this.props.fbLogin(this.props.adAssassinId)} /> : null}
-            {this.props.accessToken ? <FacebookSync accessToken={this.props.accessToken} /> : null}
+            {this.props.accessToken ? <FacebookSync
+            spinStart={this.props.spinStart}
+            spinStop={this.props.spinStop}
+            accessToken={this.props.accessToken}
+             /> : null}
             <Notifications />
             {!this.props.isAuthenticated ?
               (<React.Fragment>
@@ -153,7 +157,9 @@ const mapStateToProps = state => {
   };
 };
 const mapDispatchToProps = dispatch => {
-  return {
+  return {    
+    spinStart: msg => dispatch(actions.spinnerStart(msg)),
+    spinStop: () => dispatch(actions.spinnerStop()),
     onTryAutoSignup: () => dispatch(actions.authCheckState()),
     fbLogin: (adAssassinId) => dispatch(actions.fbAuthAsyncAction(adAssassinId))
   };

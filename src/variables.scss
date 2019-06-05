@@ -1,0 +1,89 @@
+$drawer-width: 500;
+
+//  $primary-color: #282c34;
+//  $secondary-color: #3E98C7;
+//  $tertiary-color: #EDAD00;
+//  $quaternary-color: #4C59D0;
+//  $quinary-color: #FFAA44;
+
+// // MAIN PALLETTE
+$primary-color: #151E2F;
+$secondary-color: #AC2F32;
+$tertiary-color: #1E4276;
+$quaternary-color: #3076D1;
+$quinary-color: #FFAA44;
+$senary-color: #3E98C7;
+$gray: #AAAAAA;
+
+
+// // PASTEL PALLETTE
+// $primary-color: #bae1ff;
+// $secondary-color: #baffc9;
+// $tertiary-color: #ffffba;
+// $quaternary-color: #ffdfba;
+// $quinary-color: #ffb3ba;
+
+$blue: #007bff !default; // primary
+$indigo: #6610f2 !default;
+$purple: #6f42c1 !default;
+$pink: #e83e8c !default;
+$red: #dc3545 !default; // danger
+$orange: #fd7e14 !default;
+$yellow: #ffc107 !default; // warning
+$green: #28a745 !default; // success
+$teal: #20c997 !default;
+$cyan: #17a2b8 !default; // info
+
+$white: #ffffff !default;
+
+
+
+$header-height: 60px;
+
+.error {
+    background-color: #dc3545;
+}
+
+.inProgress {
+    background-color: #007bff;
+}
+
+.completed {
+    background-color: #28a745;
+}
+
+.queued {
+    background-color: #3E98C7;
+}
+
+.canceled {
+    background-color: lighten($primary-color, 15);
+}
+
+.notEvaluated {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.errorColor {
+    color: #dc3545;
+}
+
+.inProgressColor {
+    color: #007bff;
+}
+
+.completedColor {
+    color: #28a745;
+}
+
+.queuedColor {
+    color: #3E98C7;
+}
+
+.canceledColor {
+    color: lighten($primary-color, 15);
+}
+
+.notEvaluatedColor {
+    color: rgba(255, 255, 255, 0.5);
+}

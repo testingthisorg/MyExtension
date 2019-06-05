@@ -1,0 +1,77 @@
+@import '../../variables.scss';
+.container {
+    margin-top: $header-height;
+    display: flex;
+    flex-flow: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 1rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.headerBtnContainer {
+    max-width: 100px;
+    width: 100%;
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.fileInput {
+    display: none
+}
+
+.fileUploadLabel {
+    margin: auto;
+}
+
+.listsContainer {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-around;
+    align-items: stretch;
+    height: 100%;
+}
+
+.listContainer {
+    display: flex;
+    flex-flow: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    height: 65vh;
+    width: 100%;
+    margin: 1rem;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.listHeader {
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: .5rem;
+}
+.bottomBtnContainer{
+    display: flex;
+    flex-flow: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-self: center;
+    width: 400px;
+}
+.warning {
+    background-color: pink;
+    color: $red;
+    // font-weight: bold;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: .1rem solid $red;
+    margin: 0.5rem;
+    font-size: 1.5rem;
+}

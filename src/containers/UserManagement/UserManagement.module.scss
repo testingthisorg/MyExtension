@@ -1,0 +1,47 @@
+@import '../../variables.scss';
+
+.container {
+    margin-top: $header-height;
+    display: flex;
+    flex-flow: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 1rem;
+}
+.itemTable {
+    height: 75vh;
+}
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.headerBtnContainer {
+    max-width: 100px;
+    width: 100%;
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.avatar {
+    height: 2.5rem;
+    width: auto;
+}
+.btnRow {
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.btnEdit {
+    color: $blue
+}
+.btnSuspend {
+    color: $orange
+}
+.btnDelete {
+    color: $red
+}

@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "default": "theprodicusgroup",
+    "dev": "prodicusgroup-dev",
+    "qa": "prodicusgroup-qa",
+    "master": "theprodicusgroup"
+  }
+}

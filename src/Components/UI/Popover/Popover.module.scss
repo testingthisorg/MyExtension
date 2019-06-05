@@ -1,0 +1,63 @@
+@import '../../../variables.scss';
+
+//http://www.cssarrowplease.com/
+
+.body {
+    position: absolute;
+    z-index: 100000;
+    width: 300px;
+    // height: 100px;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.9);
+    pointer-events: none;
+    transition: all 0.15s ease-out;
+    color: white;
+    padding: 1rem;
+}
+
+
+.arrowRight {
+    position: absolute;
+    right: 0px;
+    height: 0;
+    width: 0;
+
+    border-top: 13px solid transparent;
+    border-left: 25px solid rgba(0, 0, 0, .9);
+    border-bottom: 13px solid transparent;
+
+}
+
+// .arrowBottom {
+//     position: absolute;
+//     right: 0px;
+//     height: 0;
+//     width: 0;
+//     border-top: 13px solid transparent;
+//     border-left: 25px solid rgba(0, 0, 0, .9);
+//     border-bottom: 13px solid transparent;
+// }
+
+.body:after, .body:before {
+	top: 100%;
+	left: 50%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+
+.body:after {
+	border-color: transparent;
+	border-top-color: rgba(0, 0, 0, .9);
+	border-width: 30px;
+	margin-left: -30px;
+}
+// .body:before {
+// 	border-color:transparent;
+// 	border-top-color: transparent;
+// 	border-width: 36px;
+// 	margin-left: -36px;
+// }

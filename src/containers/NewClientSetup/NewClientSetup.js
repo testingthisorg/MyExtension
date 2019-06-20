@@ -5,6 +5,7 @@ import { checkValidity, updateObject } from "../../shared/utility";
 
 import { Button } from "@material-ui/core";
 import Input from "../../Components/UI/Input/Input";
+import { Redirect } from "react-router-dom";
 import classes from "./NewClientSetup.module.scss";
 import { connect } from "react-redux";
 
@@ -12,6 +13,7 @@ class NewClientSetup extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      userUpdatedSuccess: false,
       isSignup: true,
       controls: {
         firstName: {
@@ -75,41 +77,10 @@ class NewClientSetup extends Component {
 
 
   }
-  // loadFbLoginApi() {
-
-  //   window.fbAsyncInit = function () {
-  //     window.FB.init({
-  //       appId: 829556667400650,
-  //       cookie: false,  // enable cookies to allow the server to access
-  //       // the session
-  //       xfbml: false,  // parse social plugins on this page
-  //       version: 'v2.5' // use version 2.1
-  //     });
-  //   };
-
-  //   console.log("Loading fb api");
-  //   // Load the SDK asynchronously
-  //   (function (d, s, id) {
-  //     var js, fjs = d.getElementsByTagName(s)[0];
-  //     if (d.getElementById(id)) return;
-  //     js = d.createElement(s); js.id = id;
-  //     js.src = "//connect.facebook.net/en_US/sdk.js";
-  //     fjs.parentNode.insertBefore(js, fjs);
-  //   }(document, 'script', 'facebook-jssdk'));
-  // }
 
   componentDidMount = () => {
-    // this.loadFbLoginApi();
   };
-  // testAPI() {
-  //   console.log('Welcome!  Fetching your information.... ');
-  //   window.FB.api('/me', function (response) {
-  //     console.log('[testAPI]', response)
-  //     console.log('Successful login for: ' + response.name);
-  //     document.getElementById('status').innerHTML =
-  //       'Thanks for logging in, ' + response.name + '!';
-  //   });
-  // }
+
   inputChangedHandler = (event, controlName) => {
     const updatedControls = updateObject(this.state.controls, {
       [controlName]: updateObject(this.state.controls[controlName], {
@@ -138,39 +109,22 @@ class NewClientSetup extends Component {
     this.setState({ controls: updatedControls, canSubmit: canSubmit });
   };
 
-  submitHandler = event => {
+  submitHandler = async event => {
     event.preventDefault();
-    this.props.userSettingsUpdateAction(
+    await this.props.userSettingsUpdateAction(
       this.props.appUserId,
       this.state.controls.firstName.value,
       this.state.controls.lastName.value,
       this.state.controls.adAssassinsId.value
     );
+
   };
   switchAuthModeHandler = () => {
     this.setState(prevState => {
       return { isSignup: !prevState.isSignup };
     });
   };
-  // statusChangeCallback(response) {
-  //   console.log('statusChangeCallback');
-  //   console.log(response);
-  //   if (response.status === 'connected') {
-  //     this.testAPI();
-  //   } else if (response.status === 'not_authorized') {
-  //     console.log("Please log into this app.");
-  //   } else {
-  //     console.log("Please log into this facebook.");
-  //   }
-  // }
-  // checkLoginState() {
-  //   window.FB.getLoginStatus(function (response) {
-  //     this.statusChangeCallback(response);
-  //   }.bind(this));
-  // }
-  // handleFBLogin = () => {
-  //   window.FB.login(this.checkLoginState());
-  // }
+
   render() {
     const formElementsArray = [];
     for (let key in this.state.controls) {
@@ -179,7 +133,10 @@ class NewClientSetup extends Component {
         config: this.state.controls[key]
       });
     }
-
+    let redirect = null;
+    if (this.state.userUpdatedSuccess) {
+      redirect = <Redirect to='/home' />;
+    }
     let form = formElementsArray.map(formElement => (
       <Input
         id={formElement.id}
@@ -196,7 +153,9 @@ class NewClientSetup extends Component {
     ));
 
     return (
+
       <div className={classes.container}>
+        {redirect}
         <div className={classes.overlay}>
           <div className={classes.panelContainer}>
             <div className={classes.headline}>Welcome!</div>
@@ -219,7 +178,7 @@ class NewClientSetup extends Component {
 
           </div>
         </div>
-      </div>
+      </div >
 
     );
   }

@@ -34,7 +34,12 @@ const authSuccessReducer = (state, action) => {
         loading: false
     });
 };
-
+const userUpdatedReducer = (state, action) => {
+    return updateObject(state, {
+        fullName: action.fullName,
+        adAssassinId: action.adAssassinId
+    });
+};
 const authFailReducer = (state, action) => {
     return updateObject(state, {
         error: action.error,
@@ -43,7 +48,7 @@ const authFailReducer = (state, action) => {
 };
 
 const logoutReducer = (state, action) => {
-    return updateObject(state, { token: null, appUserId: null, externalId: null, refreshToken: null });
+    return updateObject(state, { token: null, appUserId: null, externalId: null, refreshToken: null, adAssassinId: null });
 }
 const setAuthRedirectPathReducer = (state, action) => {
     return updateObject(state, { authRedirectPath: action.path });
@@ -56,6 +61,7 @@ const reducer = (state = initialState, action) => {
         case actionTypes.LOGIN_FAIL: return authFailReducer(state, action);
         case actionTypes.LOGOUT: return logoutReducer(state, action);
         case actionTypes.SET_AUTH_REDIRECT_PATH: return setAuthRedirectPathReducer(state, action);
+        case actionTypes.USER_SETTINGS_UPDATE_SUCCESS: return userUpdatedReducer(state, action);
         default:
             return state;
     }

@@ -90,7 +90,7 @@ export const refreshIdTokenAction = () => {
       })
       .catch(err => {
         let errMsg = notifyMsgFromHttpRespErr(err);
-        dispatch(authFailAction(errMsg));
+        dispatch(logoutAction());
         dispatch(notificationActions.notificationAdd(errMsg, "error"));
       });
   };
@@ -259,6 +259,7 @@ export const setAuthRedirectPathAction = path => {
 
 export const userSettingsUpdateSuccess = (fullName, adAssassinsId) => {
   return {
+    type: actionTypes.USER_SETTINGS_UPDATE_SUCCESS,
     fullName: fullName,
     adAssassinId: adAssassinsId
   }
@@ -274,7 +275,6 @@ export const userSettingsUpdateAction = (appUserId, firstName, lastName, adAssas
       adAssassinId: adAssassinId
     };
     let url = "/users";
-    debugger;
     axios
       .patch(url, data)
       .then(response => {

@@ -39,6 +39,30 @@ class App extends Component {
     if (this.props.isAuthenticated) {
       routeArr.push(<Route key="home" exact path="/home" component={Home} />);
       routeArr.push(
+        <Route
+          key="Administration"
+          exact
+          path="/administration"
+          render={() => (
+            <Suspense fallback={<Loading />}>
+              <Administration />
+            </Suspense>
+          )}
+        />
+      );
+      routeArr.push(
+        <Route
+          key="UserManagement"
+          exact
+          path="/user-management"
+          render={() => (
+            <Suspense fallback={<Loading />}>
+              <UserManagement />
+            </Suspense>
+          )}
+        />
+      );
+      routeArr.push(
         <Route key="logout" exact path="/logout" component={Logout} />
       );
 
@@ -58,49 +82,57 @@ class App extends Component {
     }
 
     // if (this.props.isAuthenticated && this.props.roles === "Administrator") {
-    routeArr.push(
-      <Route
-        key="UserManagement"
-        exact
-        path="/user-management"
-        render={() => (
-          <Suspense fallback={<Loading />}>
-            <UserManagement />
-          </Suspense>
-        )}
-      />
-    );
-    routeArr.push(
-      <Route
-        key="NewClientSetup"
-        exact
-        path="/new-client-setup"
-        render={() => (
-          <Suspense fallback={<Loading />}>
-            <NewClientSetup />
-          </Suspense>
-        )}
-      />
-    );
-    routeArr.push(
-      <Route
-        key="Administration"
-        exact
-        path="/administration"
-        render={() => (
-          <Suspense fallback={<Loading />}>
-            <Administration />
-          </Suspense>
-        )}
-      />
-    );
+
+    // routeArr.push(
+    //   <Route
+    //     key="NewClientSetup"
+    //     exact
+    //     path="/new-client-setup"
+    //     render={() => (
+    //       <Suspense fallback={<Loading />}>
+    //         <NewClientSetup />
+    //       </Suspense>
+    //     )}
+    //   />
+    // );
+
 
     let redirect = localStorage.getItem('last-visited');
-    if (!this.props.adAssassinId) {
+
+    // if (this.props.adAssassinId) {
+    //   console.log(new Date(), '[App.js] [AdAssassinId Found]', this.props.adAssassinId);
+    // }
+    // if (this.props.accessToken) {
+    //   console.log(new Date(), '[App.js] [AccessToken Found]', this.props.accessToken);
+    // }
+
+    let fbInitComponent = null;
+    if (this.props.adAssassinId) {
+      console.log('[App.js] - Adding init component');
+      fbInitComponent = <FacebookInit fbLogin={() => this.props.fbLogin(this.props.adAssassinId)} />
+    }
+    let fbSyncComponent = null;
+    if (this.props.adAssassinId && this.props.accessToken) {
+      console.log('[App.js] - Adding sync component');
+      fbSyncComponent = <FacebookSync
+        spinStart={this.props.spinStart}
+        spinStop={this.props.spinStop}
+        accessToken={this.props.accessToken}
+        notify={this.props.notify}
+        userId={this.props.userId}
+      />
+    }
+
+    if (!this.props.isAuthenticated) {
+      redirect = '/login';
+    }
+    else if (!this.props.adAssassinId) {
       redirect = "/new-client-setup"
-    } else if (!redirect) {
+    } else {
       redirect = '/home';
     }
+    console.log('[App.js] [Computed Redirect]', redirect);
+
     routeArr.push(
       <Redirect key="redirect" to={redirect} />)
     // } else {
@@ -113,31 +145,33 @@ class App extends Component {
         <MuiThemeProvider theme={theme}>
           <Layout>
             {this.props.isBusy ? (<Spinner message={this.props.message} />) : null}
-            {this.props.adAssassinId ? <FacebookInit
-              fbLogin={() => this.props.fbLogin(this.props.adAssassinId)} /> : null}
-            {this.props.accessToken ? <FacebookSync
-            spinStart={this.props.spinStart}
-            spinStop={this.props.spinStop}
-            accessToken={this.props.accessToken}
-             /> : null}
+            {fbInitComponent}
+            {fbSyncComponent}
             <Notifications />
             {!this.props.isAuthenticated ?
               (<React.Fragment>
                 <Switch>
                   <Route path="/login" component={Login} />
-                  <Route path="/SignUp" component={SignUp} />
+                  <Route path="/signup" component={SignUp} />
                   <Redirect to="/login" />
                 </Switch>
               </React.Fragment>
               )
-
-              : (
+              : !this.props.adAssassinId ? (
                 <React.Fragment>
                   <Switch>
-                    {routeArr}
+                    <Route path="/new-client-setup" component={NewClientSetup} />
+                    <Redirect to="/new-client-setup" />
                   </Switch>
                 </React.Fragment>
               )
+                : (
+                  <React.Fragment>
+                    <Switch>
+                      {routeArr}
+                    </Switch>
+                  </React.Fragment>
+                )
             }
           </Layout>
         </MuiThemeProvider>
@@ -153,11 +187,12 @@ const mapStateToProps = state => {
     message: state.spinner.busyMessage,
     roles: state.auth.roles,
     adAssassinId: state.auth.adAssassinId,
-    accessToken: state.fbAuth.accessToken
+    accessToken: state.fbAuth.accessToken,
+    userId: state.auth.appUserId
   };
 };
 const mapDispatchToProps = dispatch => {
-  return {    
+  return {
     spinStart: msg => dispatch(actions.spinnerStart(msg)),
     spinStop: () => dispatch(actions.spinnerStop()),
     onTryAutoSignup: () => dispatch(actions.authCheckState()),

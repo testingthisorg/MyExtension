@@ -66,59 +66,25 @@ class App extends Component {
         <Route key="logout" exact path="/logout" component={Logout} />
       );
 
-      // routeArr.push(
-      //   <Route
-      //     key="ProjectCalculations"
-      //     exact
-      //     path="/project-calculations"
-      //     render={() => (
-      //       <Suspense fallback={<Loading />}>
-      //         <ProjectCalculations />
-      //       </Suspense>
-      //     )}
-      //   />
-      // );
-
     }
-
-    // if (this.props.isAuthenticated && this.props.roles === "Administrator") {
-
-    // routeArr.push(
-    //   <Route
-    //     key="NewClientSetup"
-    //     exact
-    //     path="/new-client-setup"
-    //     render={() => (
-    //       <Suspense fallback={<Loading />}>
-    //         <NewClientSetup />
-    //       </Suspense>
-    //     )}
-    //   />
-    // );
-
 
     let redirect = localStorage.getItem('last-visited');
 
-    // if (this.props.adAssassinId) {
-    //   console.log(new Date(), '[App.js] [AdAssassinId Found]', this.props.adAssassinId);
-    // }
-    // if (this.props.accessToken) {
-    //   console.log(new Date(), '[App.js] [AccessToken Found]', this.props.accessToken);
-    // }
-
     let fbInitComponent = null;
     if (this.props.adAssassinId) {
-      console.log('[App.js] - Adding init component');
+      // console.log('[App.js] - Adding init component');
       fbInitComponent = <FacebookInit fbLogin={() => this.props.fbLogin(this.props.adAssassinId)} />
     }
     let fbSyncComponent = null;
-    if (this.props.adAssassinId && this.props.accessToken) {
-      console.log('[App.js] - Adding sync component');
+    if (this.props.adAssassinId && this.props.accessToken && this.props.userId) {
+      // console.log('[App.js] - Adding sync component');
       fbSyncComponent = <FacebookSync
-        spinStart={this.props.spinStart}
-        spinStop={this.props.spinStop}
+        spinAddTask={this.props.spinAddTask}
+        spinRemoveTask={this.props.spinRemoveTask}
+        spinUpdateTask={this.props.spinUpdateTask}
         accessToken={this.props.accessToken}
         notify={this.props.notify}
+        appUserId={this.props.appUserId}
         userId={this.props.userId}
       />
     }
@@ -131,20 +97,15 @@ class App extends Component {
     } else {
       redirect = '/home';
     }
-    console.log('[App.js] [Computed Redirect]', redirect);
+    // console.log('[App.js] [Computed Redirect]', redirect);
 
-    routeArr.push(
-      <Redirect key="redirect" to={redirect} />)
-    // } else {
-    // routeArr.push(
-    //   <Redirect key="redirect" to="/simulation-builder" />)
-    // }
-
+    routeArr.push(<Redirect key="redirect" to={redirect} />);
+    let showSpinner = this.props.spinnerTasks && this.props.spinnerTasks.length > 0;
     return (
       <BrowserRouter>
         <MuiThemeProvider theme={theme}>
           <Layout>
-            {this.props.isBusy ? (<Spinner message={this.props.message} />) : null}
+            {showSpinner ? (<Spinner tasks={this.props.spinnerTasks} />) : null}
             {fbInitComponent}
             {fbSyncComponent}
             <Notifications />
@@ -183,18 +144,19 @@ class App extends Component {
 const mapStateToProps = state => {
   return {
     isAuthenticated: state.auth.token !== null,
-    isBusy: state.spinner.isBusy,
-    message: state.spinner.busyMessage,
+    spinnerTasks: state.spinner.spinnerTasks,
     roles: state.auth.roles,
     adAssassinId: state.auth.adAssassinId,
     accessToken: state.fbAuth.accessToken,
-    userId: state.auth.appUserId
+    appUserId: state.auth.appUserId,
+    userId: state.fbAuth.userID
   };
 };
 const mapDispatchToProps = dispatch => {
   return {
-    spinStart: msg => dispatch(actions.spinnerStart(msg)),
-    spinStop: () => dispatch(actions.spinnerStop()),
+    spinAddTask: (id, spinner_message, indicator, pct_complete) => dispatch(actions.spinnerAddTask(id, spinner_message, indicator, pct_complete)),
+    spinUpdateTask: (id, spinner_message, indicator, pct_complete) => dispatch(actions.spinnerUpdateTask(id, spinner_message, indicator, pct_complete)),
+    spinRemoveTask: (task_id) => dispatch(actions.spinnerRemoveTask(task_id)),
     onTryAutoSignup: () => dispatch(actions.authCheckState()),
     fbLogin: (adAssassinId) => dispatch(actions.fbAuthAsyncAction(adAssassinId))
   };

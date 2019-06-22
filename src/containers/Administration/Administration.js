@@ -132,8 +132,8 @@ class Administration extends Component {
 }
 const mapDispatchToProps = dispatch => {
     return {
-        spinStart: msg => dispatch(actions.spinnerStart(msg)),
-        spinStop: () => dispatch(actions.spinnerStop()),
+        // spinStart: msg => dispatch(actions.spinnerStart(msg)),
+        // spinStop: () => dispatch(actions.spinnerStop()),
         notify: (msg, variant) => dispatch(actions.notificationAdd(msg, variant))
     };
 };

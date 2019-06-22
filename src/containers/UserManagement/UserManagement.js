@@ -1,21 +1,37 @@
-import React, { Component } from "react";
-import classes from "./UserManagement.module.scss";
-import ReactTable from "react-table";
-import AddIcon from "@material-ui/icons/Add";
-import RefreshIcon from "@material-ui/icons/Refresh";
-// import Button from "@material-ui/core/Button";
-import axios from "axios";
 import "react-table/react-table.css";
-import UserDialog from "./UserDialog/UserDialog";
-import IconButton from "@material-ui/core/IconButton";
+
+import * as actions from "../../store/actions/index";
+
+import React, { Component } from "react";
+
+import AddIcon from "@material-ui/icons/Add";
+import BlockIcon from "@material-ui/icons/Block";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
-import BlockIcon from "@material-ui/icons/Block";
+import Fab from "@material-ui/core/Fab";
+import IconButton from "@material-ui/core/IconButton";
+import ReactTable from "react-table";
+import RefreshIcon from "@material-ui/icons/Refresh";
 import Tooltip from "@material-ui/core/Tooltip";
-import * as actions from "../../store/actions/index";
+import UserDialog from "./UserDialog/UserDialog";
+import axios from "axios";
+import classes from "./UserManagement.module.scss";
 import { connect } from "react-redux";
 import { notifyMsgFromHttpRespErr } from "../../shared/utility";
-import Fab from "@material-ui/core/Fab";
+
+// import Button from "@material-ui/core/Button";
+
+
+
+
+
+
+
+
+
+
+
+
 
 class UserManagement extends Component {
   constructor(props) {
@@ -232,8 +248,8 @@ class UserManagement extends Component {
 }
 const mapDispatchToProps = dispatch => {
   return {
-    spinStart: msg => dispatch(actions.spinnerStart(msg)),
-    spinStop: () => dispatch(actions.spinnerStop()),
+    // spinStart: msg => dispatch(actions.spinnerStart(msg)),
+    // spinStop: () => dispatch(actions.spinnerStop()),
     notify: (msg, variant) => dispatch(actions.notificationAdd(msg, variant))
   };
 };

@@ -1,7 +1,19 @@
 import { RandomSleep, notifyMsgFromHttpRespErr } from "../../shared/utility";
 import React, { Component } from 'react'
-import { aaGetUserAdAccountIds, aaGetUserSyncStatus, aaSendAdAccounts, aaSendCampaigns } from "./AdAssassinApiCalls";
-import { fbGetAdAccounts, fbGetCampaigns } from "./FacebookApiCalls";
+import {
+    aaGetUserAdAccountIds,
+    aaGetUserAdCreativeIds,
+    aaGetUserAdIds,
+    aaGetUserAdSetIds,
+    aaGetUserCampaignIds,
+    aaGetUserSyncStatus,
+    aaSendAdAccounts,
+    aaSendAdCreatives,
+    aaSendAdSets,
+    aaSendAds,
+    aaSendCampaigns
+} from "./AdAssassinApiCalls";
+import { fbGetAdAccounts, fbGetAdCreatives, fbGetAdSets, fbGetAds, fbGetCampaigns } from "./FacebookApiCalls";
 
 import Axios from "axios";
 
@@ -28,7 +40,7 @@ export class FacebookSync extends Component {
 
     beginProcessing = async () => {
         let token = this.props.accessToken;
-        this.props.spinStart("Analyzing. Pleasee not close your browser.");
+        this.props.spinAddTask(99, "Analyzing. Please do not close the browser.", 2, 0.01);
         let syncStati = await aaGetUserSyncStatus(this.props.userId);
         console.log('[sync statuses]', syncStati);
         let syncStatus = syncStati[0];
@@ -36,34 +48,94 @@ export class FacebookSync extends Component {
         let accountIdsToSync = [];
         let campaigns = [];
         let campaignIdsToSync = [];
+        let adsets = [];
+        let adsetIdsToSync = [];
+        let ads = [];
+        let adIdsToSync = [];
+        let creatives = [];
+        let creativeIdsToSync = [];
+        let leadForms = [];
+        let leadFormIdsToSync = [];
 
+        // =========================== Accounts ===================================
         if (!syncStatus.adAccountsCompleted) {
-            await RandomSleep(3, 9);
+            await RandomSleep(2, 5);
             accnts = await fbGetAdAccounts(token);
-            await RandomSleep(3, 9);
-            accountIdsToSync = await aaSendAdAccounts(accnts);
+            console.log(accnts.data.map(k => { return { accnt_id: k.id, owner_id: k.owner } }));
+            accountIdsToSync = await aaSendAdAccounts(accnts.data);
         } else {
+            await RandomSleep(1, 2);
             accountIdsToSync = await aaGetUserAdAccountIds(this.props.userId);
-            console.log('[Skipping AdAccount Syncing]', accountIdsToSync);
         }
+        console.log('[Ad Account Ids to Sync]', accountIdsToSync);
+
+        // =========================== Campaigns ===================================
+        this.props.spinUpdateTask(99, "Just getting started here.", 2, 17);
         if (!syncStatus.campaignsCompleted) {
-            await RandomSleep(3, 9);
+            await RandomSleep(3, 7);
             campaigns = await fbGetCampaigns(token, accountIdsToSync);
-            debugger;
-            console.log('[fbGetCampaigns]', campaigns);
-            await RandomSleep(3, 9);
             campaignIdsToSync = await aaSendCampaigns(campaigns);
-        } else console.log('[Skipping Campaigns]');
+        } else {
+            await RandomSleep(1, 2);
+            campaignIdsToSync = await aaGetUserCampaignIds(this.props.userId);
+        }
+        console.log('[Campaign Ids to Sync]', campaignIdsToSync);
+        // =========================== Ad Sets ===================================
+        this.props.spinUpdateTask(99, "Sit tight we're getting closer.", 2, 34);
         if (!syncStatus.adSetsCompleted) {
+            await RandomSleep(3, 7);
+            adsets = await fbGetAdSets(token, campaignIdsToSync,
+                this.props.spinUpdateTask.bind(this, 99, "Sit tight we're getting closer.", 2));
+            adsetIdsToSync = await aaSendAdSets(adsets);
+        } else {
+            await RandomSleep(1, 2);
+            adsetIdsToSync = await aaGetUserAdSetIds(this.props.userId);
+        };
+        console.log('[AdSet Ids to Sync]', adsetIdsToSync);
 
-
-        } else console.log('[Skipping Ad Sets]');
+        // =========================== Ads ===================================
+        this.props.spinUpdateTask(99, "Hang in there kiddo!", 2, 51);
         if (!syncStatus.adsCompleted) {
-        } else console.log('[Skipping Ads]');
+            await RandomSleep(3, 7);
+            ads = await fbGetAds(token, adsetIdsToSync,
+                this.props.spinUpdateTask.bind(this, 99, "Hang in there kiddo!", 2));
+            adIdsToSync = await aaSendAds(ads);
+        } else {
+            await RandomSleep(1, 2);
+            adIdsToSync = await aaGetUserAdIds(this.props.userId);
+        };
+        console.log('[Ad Ids to Sync]', adIdsToSync);
+        // // =========================== Creatives ===================================
+        // this.props.spinUpdateTask(99, "Just a few more left", 2, 68);
         if (!syncStatus.creativesCompleted) {
-        } else console.log('[Skipping Creatives]');
-        if (!syncStatus.leadFormsCompleted) {
-        } else console.log('[Skipping Lead Forms]');
+            await RandomSleep(3, 7);
+            creatives = await fbGetAdCreatives(token, adIdsToSync,
+                this.props.spinUpdateTask.bind(this, 99, "Hang in there kiddo!", 2));
+            creativeIdsToSync = await aaSendAdCreatives(creatives);
+        } else {
+            await RandomSleep(1, 2);
+            creativeIdsToSync = await aaGetUserAdCreativeIds(this.props.userId);
+        };
+        console.log('[Ad Creative Ids to Sync]', creativeIdsToSync);
+
+        // // =========================== Lead Forms ===================================
+        // this.props.spinUpdateTask(99, "Any second now...", 2, 85);
+        // if (!syncStatus.leadFormsCompleted) {
+        //     await RandomSleep(3, 7);
+        //     leadForms = await fbGetLeadForms(token, adIdsToSync);
+        //     leadFormIdsToSync = await aaSendLeadForms(leadForms);
+        // } else {
+        //     leadFormIdsToSync = await aaGetUserLeadFormIds(this.props.userId);
+        // };
+        // console.log('[Lead Form Ids to Sync]', leadFormIdsToSync);
+
+
+        this.props.spinUpdateTask(99, "We did it!", 2, 100);
+        await RandomSleep(2, 5);
+
+        // =========================================================================
+        this.props.spinRemoveTask(99);
+        //this.props.spinRemoveTask(99);
         // for each account go get the campaigns from fb
 
 

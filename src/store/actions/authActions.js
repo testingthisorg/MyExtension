@@ -65,7 +65,7 @@ export const logoutAction = () => {
 export const checkAuthTimeoutAction = expirationTime => {
   return dispatch => {
     setTimeout(() => {
-      console.log("[Refreshing Id Token ...");
+      console.log("[Refreshing Id Token]");
       dispatch(refreshIdTokenAction());
       //dispatch(logoutAction());
     },
@@ -91,6 +91,7 @@ export const refreshIdTokenAction = () => {
       .catch(err => {
         let errMsg = notifyMsgFromHttpRespErr(err);
         dispatch(logoutAction());
+        dispatch(spinner.spinnerClearTasks());
         dispatch(notificationActions.notificationAdd(errMsg, "error"));
       });
   };
@@ -99,7 +100,7 @@ export const refreshIdTokenAction = () => {
 export const authAsyncAction = (email, password, isSignup) => {
   return dispatch => {
     dispatch(authStartAction());
-    dispatch(spinner.spinnerStart("Authenticating"));
+    dispatch(spinner.spinnerAddTask(1, "Authenticating"));
     const authData = {
       email: email,
       password: password
@@ -138,20 +139,20 @@ export const authAsyncAction = (email, password, isSignup) => {
           )
         );
         dispatch(checkAuthTimeoutAction(response.data.expiresIn));
-        dispatch(spinner.spinnerStop());
+        dispatch(spinner.spinnerRemoveTask(1));
       })
       .catch(err => {
         let errMsg = notifyMsgFromHttpRespErr(err);
         dispatch(authFailAction(errMsg));
         dispatch(notificationActions.notificationAdd(errMsg, "error"));
-        dispatch(spinner.spinnerStop());
+        dispatch(spinner.spinnerRemoveTask(1));
       });
   };
 };
 export const signUpAsyncAction = (email, password, inviteCode) => {
   return dispatch => {
     dispatch(authStartAction());
-    dispatch(spinner.spinnerStart("Registering"));
+    dispatch(spinner.spinnerAddTask(2, "Registering"));
     const authData = {
       email: email,
       password: password,
@@ -191,13 +192,13 @@ export const signUpAsyncAction = (email, password, inviteCode) => {
           )
         );
         dispatch(checkAuthTimeoutAction(response.data.expiresIn));
-        dispatch(spinner.spinnerStop());
+        dispatch(spinner.spinnerRemoveTask(2));
       })
       .catch(err => {
         let errMsg = notifyMsgFromHttpRespErr(err);
         dispatch(authFailAction(errMsg));
         dispatch(notificationActions.notificationAdd(errMsg, "error"));
-        dispatch(spinner.spinnerStop());
+        dispatch(spinner.spinnerRemoveTask(2));
       });
   };
 };
@@ -267,7 +268,7 @@ export const userSettingsUpdateSuccess = (fullName, adAssassinsId) => {
 
 export const userSettingsUpdateAction = (appUserId, firstName, lastName, adAssassinId) => {
   return dispatch => {
-    dispatch(spinner.spinnerStart("Updating"));
+    dispatch(spinner.spinnerAddTask(3, "Updating"));
     const data = {
       appUserId: appUserId,
       firstName: firstName,
@@ -287,12 +288,12 @@ export const userSettingsUpdateAction = (appUserId, firstName, lastName, adAssas
             response.data.adAssassinId
           )
         );
-        dispatch(spinner.spinnerStop());
+        dispatch(spinner.spinnerRemoveTask(3));
       })
       .catch(err => {
         let errMsg = notifyMsgFromHttpRespErr(err);
         dispatch(notificationActions.notificationAdd(errMsg, "error"));
-        dispatch(spinner.spinnerStop());
+        dispatch(spinner.spinnerRemoveTask(3));
       });
   };
 };

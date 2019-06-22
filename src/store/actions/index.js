@@ -28,8 +28,10 @@ export {
 } from './notificationActions';
 
 export {
-    spinnerStart,
-    spinnerStop
+    spinnerAddTask,
+    spinnerRemoveTask,
+    spinnerUpdateTask,
+    spinnerClearTasks
 } from './spinnerActions';
 
 export {

@@ -51,7 +51,7 @@ export const fbPollStatus = () => {
             response.status
           )
         );
-        dispatch(spinner.spinnerStop());
+        dispatch(spinner.spinnerRemoveTask(100));
         window.clearInterval(interval);
       } else {
         console.log('[fbStatusChanged] Unhandled status!!! "' + response.status + '"');
@@ -83,7 +83,7 @@ export const fbAuthAsyncAction = (adAssassinId) => {
               response.status
             )
           );
-          dispatch(spinner.spinnerStop());
+          dispatch(spinner.spinnerRemoveTask(100));
         } else {
           console.log('[fbStatusChanged] Unhandled status!!! "' + response.status + '"');
         }
@@ -105,7 +105,7 @@ export const fbAuthAsyncAction = (adAssassinId) => {
         window.FB.login(fbStatusChanged);
       }
 
-      dispatch(spinner.spinnerStart("Signing in to Facebook"));
+      dispatch(spinner.spinnerAddTask(100, "Signing in to Facebook"));
 
       console.log("[Initializing Fb 1st]", adAssassinId);
       window.fbAsyncInit = () => {

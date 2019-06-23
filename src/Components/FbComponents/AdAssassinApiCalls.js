@@ -15,6 +15,9 @@ export async function aaSendAds(data) {
 export async function aaSendAdCreatives(data) {
     return await Axios.post("aa-ad-creatives", data).then(k => k.data);
 }
+export async function aaSendAdImages(data) {
+    return await Axios.post("aa-ad-images", data).then(k => k.data);
+}
 export async function aaSendLeadForms(data) {
     return await Axios.post("aa-lead-forms", data).then(k => k.data);
 }
@@ -43,6 +46,10 @@ export async function aaGetUserAdIds(userId) {
 }
 export async function aaGetUserAdCreativeIds(userId) {
     let url = "aa-ad-creatives/" + userId + "/ad-creative-ids";
+    return await Axios.get(url).then(k => k.data);
+}
+export async function aaGetUserAdImageIds(userId) {
+    let url = "aa-ad-images/" + userId + "/ad-image-ids";
     return await Axios.get(url).then(k => k.data);
 }
 export async function aaGetUserLeadFormIds(userId) {

@@ -4,20 +4,21 @@ import {
     aaGetUserAdAccountIds,
     aaGetUserAdCreativeIds,
     aaGetUserAdIds,
+    aaGetUserAdImageIds,
     aaGetUserAdSetIds,
     aaGetUserCampaignIds,
     aaGetUserSyncStatus,
     aaSendAdAccounts,
     aaSendAdCreatives,
+    aaSendAdImages,
     aaSendAdSets,
     aaSendAds,
     aaSendCampaigns
 } from "./AdAssassinApiCalls";
-import { fbGetAdAccounts, fbGetAdCreatives, fbGetAdSets, fbGetAds, fbGetCampaigns } from "./FacebookApiCalls";
+import { fbGetAdAccounts, fbGetAdCreatives, fbGetAdImages, fbGetAdSets, fbGetAds, fbGetCampaigns } from "./FacebookApiCalls";
 
 import Axios from "axios";
 
-const accnt_fields = "account_id,account_status,age,agency_client_declaration,amount_spent,attribution_spec,balance,business,business_city,business_country_code,business_name,business_state,business_street,business_street2,business_zip,can_create_brand_lift_study,created_time,currency,disable_reason,end_advertiser,end_advertiser_name,failed_delivery_checks,fb_entity,has_migrated_permissions,min_daily_budget,name,owner,partner,spend_cap,timezone_id,timezone_name,timezone_offset_hours_utc,id,io_number,min_campaign_group_spend_cap";
 export class FacebookSync extends Component {
     constructor(props) {
         super(props);
@@ -40,9 +41,10 @@ export class FacebookSync extends Component {
 
     beginProcessing = async () => {
         let token = this.props.accessToken;
+        let status_interval = 100 / 8;
         this.props.spinAddTask(99, "Analyzing. Please do not close the browser.", 2, 0.01);
         let syncStati = await aaGetUserSyncStatus(this.props.userId);
-        console.log('[sync statuses]', syncStati);
+        await RandomSleep(1, 3);
         let syncStatus = syncStati[0];
         let accnts = [];
         let accountIdsToSync = [];
@@ -54,10 +56,14 @@ export class FacebookSync extends Component {
         let adIdsToSync = [];
         let creatives = [];
         let creativeIdsToSync = [];
+        let adimages = [];
+        let adimageIdsToSync = [];
         let leadForms = [];
         let leadFormIdsToSync = [];
 
         // =========================== Accounts ===================================
+
+        this.props.spinUpdateTask(99, "Warming up the engines", 2, status_interval * 1);
         if (!syncStatus.adAccountsCompleted) {
             await RandomSleep(2, 5);
             accnts = await fbGetAdAccounts(token);
@@ -70,10 +76,11 @@ export class FacebookSync extends Component {
         console.log('[Ad Account Ids to Sync]', accountIdsToSync);
 
         // =========================== Campaigns ===================================
-        this.props.spinUpdateTask(99, "Just getting started here.", 2, 17);
+        this.props.spinUpdateTask(99, null, 2, status_interval * 2);
         if (!syncStatus.campaignsCompleted) {
-            await RandomSleep(3, 7);
-            campaigns = await fbGetCampaigns(token, accountIdsToSync);
+            await RandomSleep(2, 5);
+            campaigns = await fbGetCampaigns(token, accountIdsToSync, status_interval, status_interval * 2,
+                this.props.spinUpdateTask.bind(this, 99, null, 2));
             campaignIdsToSync = await aaSendCampaigns(campaigns);
         } else {
             await RandomSleep(1, 2);
@@ -81,11 +88,11 @@ export class FacebookSync extends Component {
         }
         console.log('[Campaign Ids to Sync]', campaignIdsToSync);
         // =========================== Ad Sets ===================================
-        this.props.spinUpdateTask(99, "Sit tight we're getting closer.", 2, 34);
+        this.props.spinUpdateTask(99, null, 2, status_interval * 3);
         if (!syncStatus.adSetsCompleted) {
-            await RandomSleep(3, 7);
-            adsets = await fbGetAdSets(token, campaignIdsToSync,
-                this.props.spinUpdateTask.bind(this, 99, "Sit tight we're getting closer.", 2));
+            await RandomSleep(2, 5);
+            adsets = await fbGetAdSets(token, campaignIdsToSync, status_interval, status_interval * 3,
+                this.props.spinUpdateTask.bind(this, 99, null, 2));
             adsetIdsToSync = await aaSendAdSets(adsets);
         } else {
             await RandomSleep(1, 2);
@@ -94,11 +101,11 @@ export class FacebookSync extends Component {
         console.log('[AdSet Ids to Sync]', adsetIdsToSync);
 
         // =========================== Ads ===================================
-        this.props.spinUpdateTask(99, "Hang in there kiddo!", 2, 51);
+        this.props.spinUpdateTask(99, null, 2, status_interval * 4);
         if (!syncStatus.adsCompleted) {
-            await RandomSleep(3, 7);
-            ads = await fbGetAds(token, adsetIdsToSync,
-                this.props.spinUpdateTask.bind(this, 99, "Hang in there kiddo!", 2));
+            await RandomSleep(2, 5);
+            ads = await fbGetAds(token, adsetIdsToSync, status_interval, status_interval * 4,
+                this.props.spinUpdateTask.bind(this, 99, null, 2));
             adIdsToSync = await aaSendAds(ads);
         } else {
             await RandomSleep(1, 2);
@@ -106,18 +113,29 @@ export class FacebookSync extends Component {
         };
         console.log('[Ad Ids to Sync]', adIdsToSync);
         // // =========================== Creatives ===================================
-        // this.props.spinUpdateTask(99, "Just a few more left", 2, 68);
+        this.props.spinUpdateTask(99, null, 2, status_interval * 5);
         if (!syncStatus.creativesCompleted) {
-            await RandomSleep(3, 7);
-            creatives = await fbGetAdCreatives(token, adIdsToSync,
-                this.props.spinUpdateTask.bind(this, 99, "Hang in there kiddo!", 2));
+            await RandomSleep(2, 5);
+            creatives = await fbGetAdCreatives(token, adIdsToSync, status_interval, status_interval * 5,
+                this.props.spinUpdateTask.bind(this, 99, null, 2));
             creativeIdsToSync = await aaSendAdCreatives(creatives);
         } else {
             await RandomSleep(1, 2);
             creativeIdsToSync = await aaGetUserAdCreativeIds(this.props.userId);
         };
         console.log('[Ad Creative Ids to Sync]', creativeIdsToSync);
-
+        // // =========================== Images ===================================
+        this.props.spinUpdateTask(99, null, 2, status_interval * 6);
+        if (!syncStatus.adImagesCompleted) {
+            await RandomSleep(2, 5);
+            adimages = await fbGetAdImages(token, accountIdsToSync, status_interval, status_interval * 6,
+                this.props.spinUpdateTask.bind(this, 99, null, 2));
+            adimageIdsToSync = await aaSendAdImages(adimages);
+        } else {
+            await RandomSleep(1, 2);
+            adimageIdsToSync = await aaGetUserAdImageIds(this.props.userId);
+        };
+        console.log('[Ad Image Ids to Sync]', adimageIdsToSync);
         // // =========================== Lead Forms ===================================
         // this.props.spinUpdateTask(99, "Any second now...", 2, 85);
         // if (!syncStatus.leadFormsCompleted) {
